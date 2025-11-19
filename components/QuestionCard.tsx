@@ -11,6 +11,7 @@ interface QuestionCardProps {
   isAnswered: boolean;
   onAnswerSelect: (index: number) => void;
   onNext: () => void;
+  currentTeam: 1 | 2;
 }
 
 const icons = [
@@ -35,6 +36,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
   isAnswered,
   onAnswerSelect,
   onNext,
+  currentTeam
 }) => {
   const getButtonClass = (index: number) => {
     if (!isAnswered) {
@@ -45,44 +47,52 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
     const isSelected = index === selectedAnswerIndex;
 
     if (isCorrect) {
-      return "bg-gradient-to-br from-green-500 to-green-700 scale-105 ring-4 ring-white";
+      return "bg-gradient-to-br from-green-500 to-green-700 scale-105 ring-4 ring-white z-10";
     }
     if (isSelected && !isCorrect) {
-      return "bg-gradient-to-br from-red-500 to-red-700 opacity-50";
+      return "bg-gradient-to-br from-red-500 to-red-700 opacity-50 grayscale";
     }
-    return "bg-gray-600 opacity-50";
+    return "bg-gray-600 opacity-30 grayscale";
   };
 
   return (
     <div className="flex flex-col h-full">
-      <div className="text-center mb-6">
-        <p className="text-lg text-gray-400">Pregunta {questionNumber} de {totalQuestions}</p>
-        <h2 className="text-2xl md:text-3xl font-bold mt-2">{question.question}</h2>
+      <div className="text-center mb-8 relative">
+        <div className="absolute top-0 left-0 w-full flex justify-center -mt-4">
+            <span className={`px-6 py-1 rounded-b-lg font-bold text-sm uppercase tracking-widest shadow-lg ${currentTeam === 1 ? 'bg-blue-600 text-white' : 'bg-pink-600 text-white'}`}>
+                Turno del Equipo {currentTeam}
+            </span>
+        </div>
+        
+        <div className="mt-8">
+            <p className="text-lg text-gray-400 font-medium">Pregunta {questionNumber} / {totalQuestions}</p>
+            <h2 className="text-2xl md:text-4xl font-bold mt-4 leading-tight max-w-3xl mx-auto">{question.question}</h2>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-grow">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 flex-grow content-center">
         {question.options.map((option, index) => (
           <button
             key={index}
             onClick={() => onAnswerSelect(index)}
             disabled={isAnswered}
-            className={`flex items-center justify-start p-4 rounded-lg text-white font-bold text-xl transition-all duration-300 transform hover:scale-105 disabled:cursor-not-allowed shadow-lg ${getButtonClass(index)}`}
+            className={`flex items-center justify-start p-6 rounded-xl text-white font-bold text-xl md:text-2xl transition-all duration-300 transform hover:scale-[1.02] disabled:cursor-not-allowed shadow-lg border-2 border-transparent ${getButtonClass(index)}`}
           >
-            <div className="w-12 h-12 flex-shrink-0 bg-white bg-opacity-20 rounded-md flex items-center justify-center mr-4">
+            <div className="w-14 h-14 flex-shrink-0 bg-black bg-opacity-20 rounded-lg flex items-center justify-center mr-6 shadow-inner">
               {icons[index]}
             </div>
-            <span>{option}</span>
+            <span className="text-left drop-shadow-md">{option}</span>
           </button>
         ))}
       </div>
 
       {isAnswered && (
-        <div className="mt-6 text-center">
+        <div className="mt-8 text-center animate-fade-in-up">
           <button
             onClick={onNext}
-            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-12 rounded-lg text-xl transition-transform transform hover:scale-105 shadow-md"
+            className="bg-white text-gray-900 hover:bg-gray-100 font-extrabold py-4 px-12 rounded-full text-xl transition-all transform hover:scale-110 shadow-[0_0_20px_rgba(255,255,255,0.4)] border-4 border-transparent hover:border-purple-400"
           >
-            {questionNumber === totalQuestions ? 'Ver Resultados' : 'Siguiente'}
+            {questionNumber === totalQuestions ? 'Ver Resultados' : 'Siguiente Pregunta'}
           </button>
         </div>
       )}
